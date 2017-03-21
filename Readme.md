@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Екатерина Крутакова](https://up.htmlacademy.ru/javascript/9/user/234149).
-* Наставник: `Неизвестно`.
+* Наставник: [Максим Сёмушкин](https://htmlacademy.ru/profile/id48647).
 
 ---
 
