@@ -11,13 +11,13 @@ comments = [
 console.log(comments);
 
 function generateNewObject(i) {
-  var userObject = {};
-  userObject.url = 'pictures/' + i + '.jpg';
-  userObject.likes = getRandomArbitary(15, 255);
-  return userObject;
+  var picturesObject = {};
+  picturesObject.url = 'pictures/' + i + '.jpg';
+  picturesObject.likes = getRandomArbitary(15, 255);
+  return picturesObject;
 }
 
-function generateUsersArray() {
+function generatePicturesArray() {
   var usersArray = [];
   for (var i = 0; i < 25; i++) {
     usersArray[i] =  generateNewObject(i);
@@ -25,8 +25,10 @@ function generateUsersArray() {
   return usersArray;
 }
 
-generateUsersArray();
-console.log(generateUsersArray());
+ generatePicturesArray();
+ console.log(generatePicturesArray());
+// generatePicturessArray();
+// console.log(generatePicturesArray());
 
 // generateNewObject();
 // console.log(generateNewObject());
@@ -36,15 +38,13 @@ function getRandomArbitary(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function generateUrlsArray() {
-  var urlsArray = [];
-    for (var min = 1, max = 26; min < max; min++) {
-    var i = min;
-    urlsArray[i] = 'pictures/' + i + '.jpg';
-  }
-  return urlsArray;
+function compareRandom(a, b) {
+  return Math.random() - 0.5;
 }
 
-generateUrlsArray();
+comments.sort(compareRandom);
+console.log(comments);
+
+
 // console.log(generateUrlsArray());
 // console.log(generateUrlsArray().length);
