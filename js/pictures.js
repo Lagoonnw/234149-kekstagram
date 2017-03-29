@@ -13,38 +13,36 @@ console.log(comments);
 function generateNewObject(i) {
   var picturesObject = {};
   picturesObject.url = 'pictures/' + i + '.jpg';
-  picturesObject.likes = getRandomArbitary(15, 255);
+  picturesObject.likes = getRandomNumber(15, 255);
+  picturesObject.comments = generateComment();
   return picturesObject;
 }
 
 function generatePicturesArray() {
-  var usersArray = [];
+  var picturesArray = [];
   for (var i = 0; i < 25; i++) {
-    usersArray[i] =  generateNewObject(i);
+    picturesArray[i] = generateNewObject(i);
   }
-  return usersArray;
+  return picturesArray;
 }
 
  generatePicturesArray();
  console.log(generatePicturesArray());
-// generatePicturessArray();
-// console.log(generatePicturesArray());
 
-// generateNewObject();
-// console.log(generateNewObject());
-
-
-function getRandomArbitary(min, max) {
+// функция для генерации рандомного числа
+function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function compareRandom(a, b) {
+// функция для рандомной сортировки массива
+function compareRandom() {
   return Math.random() - 0.5;
 }
 
-comments.sort(compareRandom);
-console.log(comments);
-
-
-// console.log(generateUrlsArray());
-// console.log(generateUrlsArray().length);
+// получаем рандомный комментарий
+function generateComment() {
+  comments.sort(compareRandom);
+  var item = getRandomNumber(1, 3).toFixed(1);
+  var comment = comments.slice(0, item);
+  return comment;
+}
