@@ -20,24 +20,23 @@ var galleryCommentsCount = galleryOverlay.querySelector('.gallery-overlay-contro
 showPictures();
 showGallaryOverlay();
 
-function func(i) {
-    var picture = pictureTemplate.cloneNode(true);
-    var comment = picture.querySelector('.picture-comments');
-    var pictureUrl = picture.querySelector('img');
-    var likeCount = picture.querySelector('.picture-likes');
-    comment.textContent = generatePicturesArray()[i].comments;
-    pictureUrl.setAttribute('src', generatePicturesArray()[i].url);
-    likeCount.textContent = generatePicturesArray()[i].likes;
-    //fragment.appendChild(picture);
-    return picture;
+function generateNodes(i) {
+  var picture = pictureTemplate.cloneNode(true);
+  var comment = picture.querySelector('.picture-comments');
+  var pictureUrl = picture.querySelector('img');
+  var likeCount = picture.querySelector('.picture-likes');
+  comment.textContent = generatePicturesArray()[i].comments;
+  pictureUrl.setAttribute('src', generatePicturesArray()[i].url);
+  likeCount.textContent = generatePicturesArray()[i].likes;
+  return picture;
 }
 
 function cloneNodes() {
-    var nodesArray = [];
-    for (var i = 0; i < 25; i++) {
-      nodesArray[i] = func(i);
-    }
-    return nodesArray;
+  var nodesArray = [];
+  for (var i = 0; i < 25; i++) {
+    nodesArray[i] = generateNodes(i);
+  }
+  return nodesArray;
 }
 
 
@@ -75,7 +74,7 @@ function generatePicturesArray() {
 function generateUrlsArray() {
   var _links = [];
   for (var i = 0; i < 26; i++) {
-    _links[i] = 'pictures/' + i + '.jpg';
+    _links[i] = 'photos/' + i + '.jpg';
   }
   var urls = _links.slice(1);
   return urls;
