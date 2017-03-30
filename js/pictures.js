@@ -8,11 +8,56 @@ comments = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как-будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
-console.log(comments);
+var pictureTemplate = document.getElementById('picture-template').content;
+var picturesBlock = document.querySelector('div.pictures');
+var fragment = document.createDocumentFragment();
+var galleryOverlay = document.querySelector('.gallery-overlay');
+var galleryOverlayUrl = galleryOverlay.querySelector('.gallery-overlay-image');
+var galleryLikesCount = galleryOverlay.querySelector('.likes-count');
+var galleryCommentsCount = galleryOverlay.querySelector('.gallery-overlay-controls-comments');
+
+
+showPictures();
+showGallaryOverlay();
+
+function func(i) {
+    var picture = pictureTemplate.cloneNode(true);
+    var comment = picture.querySelector('.picture-comments');
+    var pictureUrl = picture.querySelector('img');
+    var likeCount = picture.querySelector('.picture-likes');
+    comment.textContent = generatePicturesArray()[i].comments;
+    pictureUrl.setAttribute('src', generatePicturesArray()[i].url);
+    likeCount.textContent = generatePicturesArray()[i].likes;
+    //fragment.appendChild(picture);
+    return picture;
+}
+
+function cloneNodes() {
+    var nodesArray = [];
+    for (var i = 0; i < 25; i++) {
+      nodesArray[i] = func(i);
+    }
+    return nodesArray;
+}
+
+
+function showPictures() {
+  for (var i = 0; i < 25; i++) {
+    fragment.appendChild(cloneNodes()[i]);
+  }
+  picturesBlock.appendChild(fragment);
+}
+
+function showGallaryOverlay() {
+  galleryOverlay.classList.remove('invisible');
+  galleryOverlayUrl.setAttribute('src', generatePicturesArray()[0].url);
+  galleryLikesCount.textContent = generatePicturesArray()[0].likes;
+  galleryCommentsCount.textContent = generatePicturesArray()[0].comments.length;
+}
 
 function generateNewObject(i) {
   var picturesObject = {};
-  picturesObject.url = 'pictures/' + i + '.jpg';
+  picturesObject.url = generateUrlsArray()[i];
   picturesObject.likes = getRandomNumber(15, 255);
   picturesObject.comments = generateComment();
   return picturesObject;
@@ -26,8 +71,15 @@ function generatePicturesArray() {
   return picturesArray;
 }
 
- generatePicturesArray();
- console.log(generatePicturesArray());
+// генерируем ссылки с 1 до 25 включительно
+function generateUrlsArray() {
+  var _links = [];
+  for (var i = 0; i < 26; i++) {
+    _links[i] = 'pictures/' + i + '.jpg';
+  }
+  var urls = _links.slice(1);
+  return urls;
+}
 
 // функция для генерации рандомного числа
 function getRandomNumber(min, max) {
