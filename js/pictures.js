@@ -1,6 +1,6 @@
 'use strict';
-var comments = [];
-comments = [
+
+var usersComments = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце-концов это просто непрофессионально.',
@@ -8,6 +8,14 @@ comments = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как-будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
+var photoArray = [];
+var nodesArray = [];
+var minArrayLength = 1;
+var maxArrayLength = 25;
+var minLikesNumber = 15;
+var maxLikesNumber = 200;
+var minCommentsNumber = 1;
+var maxCommentsNumber = 2;
 var pictureTemplate = document.getElementById('picture-template').content;
 var picturesBlock = document.querySelector('div.pictures');
 var fragment = document.createDocumentFragment();
@@ -15,85 +23,78 @@ var galleryOverlay = document.querySelector('.gallery-overlay');
 var galleryOverlayUrl = galleryOverlay.querySelector('.gallery-overlay-image');
 var galleryLikesCount = galleryOverlay.querySelector('.likes-count');
 var galleryCommentsCount = galleryOverlay.querySelector('.gallery-overlay-controls-comments');
+var uploadOverlay = document.querySelector('.upload-overlay');
 
+getPhotoArray();
+generateNodesArray(photoArray);
+showPhotos(nodesArray);
+showGallaryOverlay(photoArray);
+closeUploadForm();
 
-showPictures();
-showGallaryOverlay();
+function getPhotoArray() {
+  for (var i = minArrayLength, n = maxArrayLength; i < n; i++) {
+    var picturesObject = {};
+    var likesNumber = getRandomNumber(minLikesNumber, maxLikesNumber);
+    var comments = getArrayOfRandomComments();
+    var urlName = i;
+    var url = 'photos/' + urlName + '.jpg';
 
-function generateNodes(i) {
-  var picture = pictureTemplate.cloneNode(true);
-  var comment = picture.querySelector('.picture-comments');
-  var pictureUrl = picture.querySelector('img');
-  var likeCount = picture.querySelector('.picture-likes');
-  comment.textContent = generatePicturesArray()[i].comments;
-  pictureUrl.setAttribute('src', generatePicturesArray()[i].url);
-  likeCount.textContent = generatePicturesArray()[i].likes;
-  return picture;
+    picturesObject.url = url;
+    picturesObject.likes = likesNumber;
+    picturesObject.comments = comments;
+    photoArray.push(picturesObject);
+  }
+  return photoArray;
 }
 
-function cloneNodes() {
-  var nodesArray = [];
-  for (var i = 0; i < 25; i++) {
-    nodesArray[i] = generateNodes(i);
+function generateNodesArray(arr) {
+  for (var i = 0, n = arr.length; i < n; i++) {
+    var picture = pictureTemplate.cloneNode(true);
+    var comment = picture.querySelector('.picture-comments');
+    var pictureUrl = picture.querySelector('img');
+    var likeCount = picture.querySelector('.picture-likes');
+
+    comment.textContent = arr[i].comments;
+    pictureUrl.setAttribute('src', arr[i].url);
+    likeCount.textContent = arr[i].likes;
+    nodesArray.push(picture);
   }
   return nodesArray;
 }
 
-
-function showPictures() {
-  for (var i = 0; i < 25; i++) {
-    fragment.appendChild(cloneNodes()[i]);
+function showPhotos(arr) {
+  for (var i = 0; i < arr.length; i++) {
+    fragment.appendChild(arr[i]);
   }
   picturesBlock.appendChild(fragment);
 }
 
-function showGallaryOverlay() {
+function showGallaryOverlay(arr) {
   galleryOverlay.classList.remove('invisible');
-  galleryOverlayUrl.setAttribute('src', generatePicturesArray()[0].url);
-  galleryLikesCount.textContent = generatePicturesArray()[0].likes;
-  galleryCommentsCount.textContent = generatePicturesArray()[0].comments.length;
+  galleryOverlayUrl.setAttribute('src', arr[0].url);
+  galleryLikesCount.textContent = arr[0].likes;
+  galleryCommentsCount.textContent = arr[0].comments.length;
 }
 
-function generateNewObject(i) {
-  var picturesObject = {};
-  picturesObject.url = generateUrlsArray()[i];
-  picturesObject.likes = getRandomNumber(15, 255);
-  picturesObject.comments = generateComment();
-  return picturesObject;
+function closeUploadForm() {
+  uploadOverlay.classList.add('invisible');
 }
 
-function generatePicturesArray() {
-  var picturesArray = [];
-  for (var i = 0; i < 25; i++) {
-    picturesArray[i] = generateNewObject(i);
+function getArrayOfRandomComments() {
+  var comments = [];
+  var n = getRandomNumber(minCommentsNumber, maxCommentsNumber);
+  for (var i = minCommentsNumber; i <= n; i++) {
+    var photoComment = getRandomArrayItem(usersComments);
+    comments.push(photoComment);
   }
-  return picturesArray;
+  return comments;
 }
 
-// генерируем ссылки с 1 до 25 включительно
-function generateUrlsArray() {
-  var _links = [];
-  for (var i = 0; i < 26; i++) {
-    _links[i] = 'photos/' + i + '.jpg';
-  }
-  var urls = _links.slice(1);
-  return urls;
+function getRandomArrayItem(arr) {
+  var randNum = Math.floor(Math.random() * arr.length);
+  return arr[randNum];
 }
 
-// функция для генерации рандомного числа
 function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
-// функция для рандомной сортировки массива
-function compareRandom() {
-  return Math.random() - 0.5;
-}
-
-// получаем рандомный комментарий
-function generateComment() {
-  comments.sort(compareRandom);
-  var item = getRandomNumber(1, 3).toFixed(1);
-  var comment = comments.slice(0, item);
-  return comment;
+  return Math.floor(Math.random() * ((max + 1) - min) + min);
 }
