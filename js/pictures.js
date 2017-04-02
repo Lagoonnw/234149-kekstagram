@@ -28,7 +28,7 @@ var uploadOverlay = document.querySelector('.upload-overlay');
 getPhotoArray();
 generateNodesArray(photoArray);
 showPhotos(nodesArray);
-showGallaryOverlay(photoArray);
+showGalleryOverlay(photoArray);
 closeUploadForm();
 
 function getPhotoArray() {
@@ -69,7 +69,7 @@ function showPhotos(arr) {
   picturesBlock.appendChild(fragment);
 }
 
-function showGallaryOverlay(arr) {
+function showGalleryOverlay(arr) {
   galleryOverlay.classList.remove('invisible');
   galleryOverlayUrl.setAttribute('src', arr[0].url);
   galleryLikesCount.textContent = arr[0].likes;
