@@ -8,14 +8,13 @@ var usersComments = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как-будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
-var photoArray = [];
+var photoArray = generatePhotoArray();
 var minArrayLength = 1;
 var maxArrayLength = 25;
 var minLikesNumber = 15;
 var maxLikesNumber = 200;
 var minCommentsNumber = 1;
 var maxCommentsNumber = 2;
-var photoName = null;
 var photoTemplate = document.getElementById('picture-template').content;
 var picturesBlock = document.querySelector('div.pictures');
 var fragment = document.createDocumentFragment();
@@ -25,27 +24,28 @@ var galleryLikesCount = galleryOverlay.querySelector('.likes-count');
 var galleryCommentsCount = galleryOverlay.querySelector('.gallery-overlay-controls-comments');
 var uploadOverlay = document.querySelector('.upload-overlay');
 
-createPhotoObject();
 generatePhotoArray();
 showPhotos(photoArray);
-showGalleryOverlay(photoArray);
+showGalleryOverlay(generatePhotoArray(), 0);
 closeUploadForm();
 
 function generatePhotoArray() {
+  photoArray = [];
   var photoObject = {};
+  var photoName = null;
   for (var i = minArrayLength; i < maxArrayLength; i++) {
     photoName = i;
-    photoObject = createPhotoObject();
+    photoObject = createPhotoObject(photoName);
     photoArray.push(photoObject);
   }
   return photoArray;
 }
 
-function createPhotoObject() {
+function createPhotoObject(photoName) {
   var photoObject = {};
   var likesNumber = getRandomNumber(minLikesNumber, maxLikesNumber);
   var comments = getArrayOfRandomComments();
-  var url = generatePhotoUrl();
+  var url = generatePhotoUrl(photoName);
 
   photoObject.url = url;
   photoObject.likes = likesNumber;
@@ -54,41 +54,39 @@ function createPhotoObject() {
   return photoObject;
 }
 
-function generatePhotoUrl() {
+function generatePhotoUrl(photoName) {
   var url = 'photos/' + photoName + '.jpg';
   return url;
 }
 
 function showPhotos(photos) {
   var photoNode = {};
-  for (var i = 0; i < photos.length; i++) {
-    photoNode = createPhotoNode(photoArray[i]);
+  photos.forEach(function (arrayItem, i) {
+    photoNode = createPhotoNode(photos[i]);
     fragment.appendChild(photoNode);
-  }
+  });
   picturesBlock.appendChild(fragment);
 }
 
 function createPhotoNode(photo) {
   var photoNode = photoTemplate.cloneNode(true);
   var comment = photoNode.querySelector('.picture-comments');
-  var photoUrl = photoNode.querySelector('img');
+  var img = photoNode.querySelector('img');
   var likeCount = photoNode.querySelector('.picture-likes');
 
   comment.textContent = photo.comments;
-  photoUrl.setAttribute('src', photo.url);
+  img.setAttribute('src', photo.url);
+  img.setAttribute('tabindex', 0);
   likeCount.textContent = photo.likes;
 
   return photoNode;
 }
 
-
-function showGalleryOverlay(photos) {
-  var firstArrayItem = 0;
-
+function showGalleryOverlay(photos, arrayItem) {
   galleryOverlay.classList.remove('invisible');
-  galleryOverlayUrl.setAttribute('src', photos[firstArrayItem].url);
-  galleryLikesCount.textContent = photos[firstArrayItem].likes;
-  galleryCommentsCount.textContent = photos[firstArrayItem].comments.length;
+  galleryOverlayUrl.setAttribute('src', photos[arrayItem].url);
+  galleryLikesCount.textContent = photos[arrayItem].likes;
+  galleryCommentsCount.textContent = photos[arrayItem].comments.length;
 }
 
 function closeUploadForm() {
