@@ -40,6 +40,11 @@ var closeGallery = function (evt) {
   galleryOverlay.classList.add('invisible');
   document.removeEventListener('keydown', onGalleryEscPress);
 };
+var onCloseGallerySpanEntrPress = function (evt) {
+  if (evt.keyCode === ENTER_KEY_CODE) {
+    closeGallery();
+  }
+};
 var onGalleryEscPress = function (evt) {
   if (evt.keyCode === ESC_KEY_CODE) {
     closeGallery();
@@ -55,33 +60,33 @@ var onPictureClick = function (evt) {
 };
 var onUploadBtnClick = function (evt) {
   evt.preventDefault();
-  showUplodForm();
+  showUploadForm();
   closeCropForm();
 };
 
 var onUploadSubbmitBtnEntrPress = function (evt) {
   if (evt.keyCode === ENTER_KEY_CODE) {
     evt.preventDefault();
-    showUplodForm();
+    showUploadForm();
     closeCropForm();
   }
 };
 var onCropFormEscPress = function (evt) {
   if (evt.keyCode === ESC_KEY_CODE) {
-    showUplodForm();
+    showUploadForm();
     closeCropForm();
     document.removeEventListener('keydown', onCropFormEscPress);
   }
 };
 
 closeCropForm();
-showUplodForm();
+showUploadForm();
 generatePhotoArray();
 showPhotos(photoArray);
 collectPicturesElements();
 uplodFileInput.addEventListener('change', function (evt) {
   showCropForm();
-  closeUplodForm();
+  closeUploadForm();
 });
 uploadSubmitBtn.addEventListener('click', onUploadBtnClick);
 uploadSubmitBtn.addEventListener('keydown', onUploadSubbmitBtnEntrPress);
@@ -92,6 +97,7 @@ cropCommentField.addEventListener('keydown', function (evt) {
   }
 });
 closeGalley.addEventListener('click', closeGallery);
+closeGalley.addEventListener('keydown', onCloseGallerySpanEntrPress);
 pictureElements.forEach(function (item, i) {
   pictureElements[i].addEventListener('click', function (evt) {
     evt.preventDefault();
@@ -108,11 +114,11 @@ function closeCropForm() {
 function showCropForm() {
   cropOverlay.classList.remove('invisible');
 }
-function showUplodForm() {
+function showUploadForm() {
   uploadForm.classList.remove('invisible');
 }
 
-function closeUplodForm() {
+function closeUploadForm() {
   uploadForm.classList.add('invisible');
 }
 
