@@ -1,5 +1,7 @@
 'use strict';
 
+var ESC_KEY_CODE = 27;
+var ENTER_KEY_CODE = 13;
 var usersComments = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -22,12 +24,102 @@ var galleryOverlay = document.querySelector('.gallery-overlay');
 var galleryOverlayUrl = galleryOverlay.querySelector('.gallery-overlay-image');
 var galleryLikesCount = galleryOverlay.querySelector('.likes-count');
 var galleryCommentsCount = galleryOverlay.querySelector('.gallery-overlay-controls-comments');
-var uploadOverlay = document.querySelector('.upload-overlay');
+var cropOverlay = document.querySelector('.upload-overlay');
+var uploadCancelBtn = cropOverlay.querySelector('.upload-form-cancel');
+var closeGalley = galleryOverlay.querySelector('.gallery-overlay-close');
+var pictureElements = collectPicturesElements();
+var uploadForm = document.getElementById('upload-select-image');
+var uplodFileInput = uploadForm.querySelector('.upload-input');
+var cropCommentField = cropOverlay.querySelector('.upload-form-description');
+var uploadSubmitBtn = cropOverlay.querySelector('.upload-form-submit');
+var openGallery = function (evt) {
+  galleryOverlay.classList.remove('invisible');
+  document.addEventListener('keydown', onGalleryEscPress);
+};
+var closeGallery = function (evt) {
+  galleryOverlay.classList.add('invisible');
+  document.removeEventListener('keydown', onGalleryEscPress);
+};
+var onGalleryEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEY_CODE) {
+    closeGallery();
+  }
+};
+var onPictureEntrPress = function (evt) {
+  if (evt.keyCode === ENTER_KEY_CODE) {
+    openGallery();
+  }
+};
+var onPictureClick = function (evt) {
+  openGallery();
+};
+var onUploadBtnClick = function (evt) {
+  evt.preventDefault();
+  showUplodForm();
+  closeCropForm();
+};
 
+var onUploadSubbmitBtnEntrPress = function (evt) {
+  if (evt.keyCode === ENTER_KEY_CODE) {
+    evt.preventDefault();
+    showUplodForm();
+    closeCropForm();
+  }
+};
+var onCropFormEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEY_CODE) {
+    showUplodForm();
+    closeCropForm();
+    document.removeEventListener('keydown', onCropFormEscPress);
+  }
+};
+
+closeCropForm();
+showUplodForm();
 generatePhotoArray();
 showPhotos(photoArray);
-showGalleryOverlay(generatePhotoArray(), 0);
-closeUploadForm();
+collectPicturesElements();
+uplodFileInput.addEventListener('change', function (evt) {
+  showCropForm();
+  closeUplodForm();
+});
+uploadSubmitBtn.addEventListener('click', onUploadBtnClick);
+uploadSubmitBtn.addEventListener('keydown', onUploadSubbmitBtnEntrPress);
+uploadCancelBtn.addEventListener('click', onUploadBtnClick);
+cropCommentField.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ESC_KEY_CODE) {
+    evt.stopPropagation();
+  }
+});
+closeGalley.addEventListener('click', closeGallery);
+pictureElements.forEach(function (item, i) {
+  pictureElements[i].addEventListener('click', function (evt) {
+    evt.preventDefault();
+    onPictureClick();
+    showGalleryOverlay(photoArray, i);
+  });
+  pictureElements[i].addEventListener('keydown', onPictureEntrPress);
+});
+
+function closeCropForm() {
+  cropOverlay.classList.add('invisible');
+}
+
+function showCropForm() {
+  cropOverlay.classList.remove('invisible');
+}
+function showUplodForm() {
+  uploadForm.classList.remove('invisible');
+}
+
+function closeUplodForm() {
+  uploadForm.classList.add('invisible');
+}
+
+function collectPicturesElements() {
+  pictureElements = picturesBlock.querySelectorAll('.picture');
+  return pictureElements;
+}
 
 function generatePhotoArray() {
   photoArray = [];
@@ -83,14 +175,10 @@ function createPhotoNode(photo) {
 }
 
 function showGalleryOverlay(photos, arrayItem) {
-  galleryOverlay.classList.remove('invisible');
+
   galleryOverlayUrl.setAttribute('src', photos[arrayItem].url);
   galleryLikesCount.textContent = photos[arrayItem].likes;
   galleryCommentsCount.textContent = photos[arrayItem].comments.length;
-}
-
-function closeUploadForm() {
-  uploadOverlay.classList.add('invisible');
 }
 
 function getArrayOfRandomComments() {
