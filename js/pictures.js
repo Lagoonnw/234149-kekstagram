@@ -10,9 +10,8 @@ var usersComments = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как-будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
-var photoArray = generatePhotoArray();
-var minArrayLength = 1;
-var maxArrayLength = 25;
+var photoArray = [];
+var photoNode = {};
 var minLikesNumber = 15;
 var maxLikesNumber = 200;
 var minCommentsNumber = 1;
@@ -25,32 +24,33 @@ var galleryOverlayUrl = galleryOverlay.querySelector('.gallery-overlay-image');
 var galleryLikesCount = galleryOverlay.querySelector('.likes-count');
 var galleryCommentsCount = galleryOverlay.querySelector('.gallery-overlay-controls-comments');
 var cropOverlay = document.querySelector('.upload-overlay');
-var uploadCancelBtn = cropOverlay.querySelector('.upload-form-cancel');
-var closeGalley = galleryOverlay.querySelector('.gallery-overlay-close');
-var pictureElements = collectPicturesElements();
+var uploadCancelButton = cropOverlay.querySelector('.upload-form-cancel');
+var closeGalleryCross = galleryOverlay.querySelector('.gallery-overlay-close');
 var uploadForm = document.getElementById('upload-select-image');
-var uplodFileInput = uploadForm.querySelector('.upload-input');
+var uploadFileInput = uploadForm.querySelector('.upload-input');
 var cropCommentField = cropOverlay.querySelector('.upload-form-description');
-var uploadSubmitBtn = cropOverlay.querySelector('.upload-form-submit');
+var uploadSubmitButton = cropOverlay.querySelector('.upload-form-submit');
+var pictureElements = [];
+
 var openGallery = function (evt) {
   galleryOverlay.classList.remove('invisible');
-  document.addEventListener('keydown', onGalleryEscPress);
+  document.addEventListener('keydown', onGalleryEscapePress);
 };
 var closeGallery = function (evt) {
   galleryOverlay.classList.add('invisible');
-  document.removeEventListener('keydown', onGalleryEscPress);
+  document.removeEventListener('keydown', onGalleryEscapePress);
 };
-var onCloseGallerySpanEntrPress = function (evt) {
+var onGalleryCrossEnterKeypress = function (evt) {
   if (evt.keyCode === ENTER_KEY_CODE) {
     closeGallery();
   }
 };
-var onGalleryEscPress = function (evt) {
+var onGalleryEscapePress = function (evt) {
   if (evt.keyCode === ESC_KEY_CODE) {
     closeGallery();
   }
 };
-var onPictureEntrPress = function (evt) {
+var onPictureEnterPress = function (evt) {
   if (evt.keyCode === ENTER_KEY_CODE) {
     openGallery();
   }
@@ -58,77 +58,61 @@ var onPictureEntrPress = function (evt) {
 var onPictureClick = function (evt) {
   openGallery();
 };
-var onUploadBtnClick = function (evt) {
+var onUploadButtonClick = function (evt) {
   evt.preventDefault();
-  showUploadForm();
-  closeCropForm();
+  showForm(uploadForm, 'invisible');
+  closeForm(cropOverlay, 'invisible');
 };
-
-var onUploadSubbmitBtnEntrPress = function (evt) {
+var onUploadSubbmitButtonEnterPress = function (evt) {
   if (evt.keyCode === ENTER_KEY_CODE) {
     evt.preventDefault();
-    showUploadForm();
-    closeCropForm();
+    showForm(uploadForm, 'invisible');
+    closeForm(cropOverlay, 'invisible');
   }
 };
-var onCropFormEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEY_CODE) {
-    showUploadForm();
-    closeCropForm();
-    document.removeEventListener('keydown', onCropFormEscPress);
+var onCropFormEscapePress = function (evt) {
+  if (evt.keyCode === ESC_KEY_CODE && evt.target !== cropCommentField) {
+    showForm(uploadForm, 'invisible');
+    closeForm(cropOverlay, 'invisible');
+    document.removeEventListener('keydown', onCropFormEscapePress);
   }
 };
 
-closeCropForm();
-showUploadForm();
-generatePhotoArray();
-showPhotos(photoArray);
-collectPicturesElements();
-uplodFileInput.addEventListener('change', function (evt) {
-  showCropForm();
-  closeUploadForm();
+
+closeForm(cropOverlay, 'invisible');
+showForm(uploadForm, 'invisible');
+photoArray = setPhotoArray(1, 25);
+photoNode = showPhotos(photoArray);
+pictureElements = picturesBlock.querySelectorAll('.picture');
+uploadFileInput.addEventListener('change', function (evt) {
+  showForm(cropOverlay, 'invisible');
+  closeForm(uploadForm, 'invisible');
 });
-uploadSubmitBtn.addEventListener('click', onUploadBtnClick);
-uploadSubmitBtn.addEventListener('keydown', onUploadSubbmitBtnEntrPress);
-uploadCancelBtn.addEventListener('click', onUploadBtnClick);
-cropCommentField.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === ESC_KEY_CODE) {
-    evt.stopPropagation();
-  }
-});
-closeGalley.addEventListener('click', closeGallery);
-closeGalley.addEventListener('keydown', onCloseGallerySpanEntrPress);
+uploadSubmitButton.addEventListener('click', onUploadButtonClick);
+uploadSubmitButton.addEventListener('keydown', onUploadSubbmitButtonEnterPress);
+uploadCancelButton.addEventListener('click', onUploadButtonClick);
+cropOverlay.addEventListener('keydown', onCropFormEscapePress);
+closeGalleryCross.addEventListener('click', closeGallery);
+closeGalleryCross.addEventListener('keydown', onGalleryCrossEnterKeypress);
 pictureElements.forEach(function (item, i) {
   pictureElements[i].addEventListener('click', function (evt) {
     evt.preventDefault();
     onPictureClick();
     showGalleryOverlay(photoArray, i);
   });
-  pictureElements[i].addEventListener('keydown', onPictureEntrPress);
+  pictureElements[i].addEventListener('keydown', onPictureEnterPress);
 });
 
-function closeCropForm() {
-  cropOverlay.classList.add('invisible');
+
+function closeForm(element, className) {
+  element.classList.add('invisible');
 }
 
-function showCropForm() {
-  cropOverlay.classList.remove('invisible');
-}
-function showUploadForm() {
-  uploadForm.classList.remove('invisible');
+function showForm(element, className) {
+  element.classList.remove('invisible');
 }
 
-function closeUploadForm() {
-  uploadForm.classList.add('invisible');
-}
-
-function collectPicturesElements() {
-  pictureElements = picturesBlock.querySelectorAll('.picture');
-  return pictureElements;
-}
-
-function generatePhotoArray() {
-  photoArray = [];
+function setPhotoArray(minArrayLength, maxArrayLength) {
   var photoObject = {};
   var photoName = null;
   for (var i = minArrayLength; i < maxArrayLength; i++) {
@@ -142,7 +126,7 @@ function generatePhotoArray() {
 function createPhotoObject(photoName) {
   var photoObject = {};
   var likesNumber = getRandomNumber(minLikesNumber, maxLikesNumber);
-  var comments = getArrayOfRandomComments();
+  var comments = setArrayOfRandomComments();
   var url = generatePhotoUrl(photoName);
 
   photoObject.url = url;
@@ -158,7 +142,6 @@ function generatePhotoUrl(photoName) {
 }
 
 function showPhotos(photos) {
-  var photoNode = {};
   photos.forEach(function (arrayItem, i) {
     photoNode = createPhotoNode(photos[i]);
     fragment.appendChild(photoNode);
@@ -167,7 +150,7 @@ function showPhotos(photos) {
 }
 
 function createPhotoNode(photo) {
-  var photoNode = photoTemplate.cloneNode(true);
+  photoNode = photoTemplate.cloneNode(true);
   var comment = photoNode.querySelector('.picture-comments');
   var img = photoNode.querySelector('img');
   var likeCount = photoNode.querySelector('.picture-likes');
@@ -180,14 +163,13 @@ function createPhotoNode(photo) {
   return photoNode;
 }
 
-function showGalleryOverlay(photos, arrayItem) {
-
-  galleryOverlayUrl.setAttribute('src', photos[arrayItem].url);
-  galleryLikesCount.textContent = photos[arrayItem].likes;
-  galleryCommentsCount.textContent = photos[arrayItem].comments.length;
+function showGalleryOverlay(photos, photoIndexNumber) {
+  galleryOverlayUrl.setAttribute('src', photos[photoIndexNumber].url);
+  galleryLikesCount.textContent = photos[photoIndexNumber].likes;
+  galleryCommentsCount.textContent = photos[photoIndexNumber].comments.length;
 }
 
-function getArrayOfRandomComments() {
+function setArrayOfRandomComments() {
   var comments = [];
   var arrayLength = getRandomNumber(minCommentsNumber, maxCommentsNumber);
   for (var i = minCommentsNumber; i <= arrayLength; i++) {
