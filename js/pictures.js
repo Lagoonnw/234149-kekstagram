@@ -31,9 +31,11 @@ var uploadForm = document.getElementById('upload-select-image');
 var uploadFileInput = uploadForm.querySelector('.upload-input');
 var cropCommentField = cropOverlay.querySelector('.upload-form-description');
 var uploadSubmitButton = cropOverlay.querySelector('.upload-form-submit');
-var filterControls = cropOverlay.querySelector('.upload-filter-controls');
+var containerOfFilterControls = cropOverlay.querySelector('.upload-filter-controls');
+var filterControls = containerOfFilterControls.querySelectorAll('input[type=radio]');
 var picturePreview = document.querySelector('.filter-image-preview');
 var resizeControls = cropOverlay.querySelector('.upload-resize-controls');
+//console.log(filterControls);
 
 var openGallery = function (evt) {
   galleryOverlay.classList.remove('invisible');
@@ -121,12 +123,29 @@ var onUplodFileInputChange = function (evt) {
 var onFilterClick = function (evt) {
   if (evt.target.hasAttribute('type')) {
     var filter = evt.target;
-    if (filter.checked) {
-      var value = filter.value;
-      addClass(picturePreview, value);
-    }
+    //var filterName = filter.value;
+    toggleFilter(filter);
   }
 };
+
+function toggleFilter(filter) {
+  filterControls.forEach(function (item, i) {
+    var value = filterControls[i].value;
+    var className = 'filter-' + value;
+    removeClass(picturePreview, className);
+  });
+  var className = 'filter-' + filter.value;
+  addClass(picturePreview, className);
+
+}
+
+function removeClass(element, className) {
+  element.classList.remove(className);
+}
+
+function addClass(element, className) {
+  element.classList.add(className);
+}
 
 
 closeForm(cropOverlay, 'invisible');
@@ -134,7 +153,7 @@ showForm(uploadForm, 'invisible');
 photoArray = setPhotoArray(1, 25);
 photoNode = showPhotos(photoArray);
 pictureElements = picturesBlock.querySelectorAll('.picture');
-filterControls.addEventListener('click', onFilterClick);
+containerOfFilterControls.addEventListener('click', onFilterClick);
 resizeControls.addEventListener('click', onResizeControlsClick);
 uploadFileInput.addEventListener('change', onUplodFileInputChange);
 uploadSubmitButton.addEventListener('click', onSubbmitButtonClick);
@@ -169,10 +188,6 @@ function scalePhoto(value) {
   picturePreview.style.transform = 'scale(' + value / scaleDivider + ')';
 }
 
-function addClass(element, value) {
-  var className = 'filter-' + value;
-  element.classList.add(className);
-}
 
 function closeForm(element, className) {
   element.classList.add('invisible');
