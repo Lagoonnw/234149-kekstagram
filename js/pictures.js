@@ -12,6 +12,7 @@ var usersComments = [
 ];
 var photoArray = [];
 var photoNode = {};
+var pictureElements = [];
 var minLikesNumber = 15;
 var maxLikesNumber = 200;
 var minCommentsNumber = 1;
@@ -30,51 +31,98 @@ var uploadForm = document.getElementById('upload-select-image');
 var uploadFileInput = uploadForm.querySelector('.upload-input');
 var cropCommentField = cropOverlay.querySelector('.upload-form-description');
 var uploadSubmitButton = cropOverlay.querySelector('.upload-form-submit');
-var pictureElements = [];
+var containerOfFilterControls = cropOverlay.querySelector('.upload-filter-controls');
+var filterControls = containerOfFilterControls.querySelectorAll('input[type=radio]');
+var picturePreview = document.querySelector('.filter-image-preview');
+var resizeControls = cropOverlay.querySelector('.upload-resize-controls');
 
 var openGallery = function (evt) {
   galleryOverlay.classList.remove('invisible');
   document.addEventListener('keydown', onGalleryEscapePress);
 };
+
 var closeGallery = function (evt) {
   galleryOverlay.classList.add('invisible');
   document.removeEventListener('keydown', onGalleryEscapePress);
 };
+
 var onGalleryCrossEnterKeypress = function (evt) {
   if (evt.keyCode === ENTER_KEY_CODE) {
     closeGallery();
   }
 };
+
 var onGalleryEscapePress = function (evt) {
   if (evt.keyCode === ESC_KEY_CODE) {
     closeGallery();
   }
 };
+
 var onPictureEnterPress = function (evt) {
   if (evt.keyCode === ENTER_KEY_CODE) {
     openGallery();
   }
 };
+
 var onPictureClick = function (evt) {
   openGallery();
 };
+
 var onUploadButtonClick = function (evt) {
   evt.preventDefault();
   showForm(uploadForm, 'invisible');
   closeForm(cropOverlay, 'invisible');
+
 };
+
 var onUploadSubbmitButtonEnterPress = function (evt) {
   if (evt.keyCode === ENTER_KEY_CODE) {
     evt.preventDefault();
-    showForm(uploadForm, 'invisible');
-    closeForm(cropOverlay, 'invisible');
+    checkValidity();
   }
 };
+
+var onSubbmitButtonClick = function (evt) {
+  evt.preventDefault();
+  checkValidity();
+};
+
 var onCropFormEscapePress = function (evt) {
   if (evt.keyCode === ESC_KEY_CODE && evt.target !== cropCommentField) {
     showForm(uploadForm, 'invisible');
     closeForm(cropOverlay, 'invisible');
     document.removeEventListener('keydown', onCropFormEscapePress);
+  }
+};
+
+var onResizeControlsClick = function (evt) {
+  var stepForward = resizeControls.querySelector('.upload-resize-controls-button-inc');
+  var stepBack = resizeControls.querySelector('.upload-resize-controls-button-dec');
+  var stepValue = resizeControls.querySelector('.upload-resize-controls-value');
+  var minStep = 25;
+  var maxStep = 100;
+  if (evt.target === stepForward && parseInt(stepValue.value, 10) < maxStep) {
+    var value = parseInt(stepValue.value, 10) + parseInt(stepValue.step, 10);
+    scalePhoto(value);
+    stepValue.value = value + '%';
+  }
+  if (evt.target === stepBack && parseInt(stepValue.value, 10) > minStep) {
+    value = parseInt(stepValue.value, 10) - parseInt(stepValue.step, 10);
+    scalePhoto(value);
+    stepValue.value = value + '%';
+  }
+};
+
+var onUplodFileInputChange = function (evt) {
+  showForm(cropOverlay, 'invisible');
+  closeForm(uploadForm, 'invisible');
+  document.addEventListener('keydown', onCropFormEscapePress);
+};
+
+var onFilterClick = function (evt) {
+  if (evt.target.hasAttribute('type')) {
+    var filter = evt.target;
+    toggleFilter(filter);
   }
 };
 
@@ -84,11 +132,10 @@ showForm(uploadForm, 'invisible');
 photoArray = setPhotoArray(1, 25);
 photoNode = showPhotos(photoArray);
 pictureElements = picturesBlock.querySelectorAll('.picture');
-uploadFileInput.addEventListener('change', function (evt) {
-  showForm(cropOverlay, 'invisible');
-  closeForm(uploadForm, 'invisible');
-});
-uploadSubmitButton.addEventListener('click', onUploadButtonClick);
+containerOfFilterControls.addEventListener('click', onFilterClick);
+resizeControls.addEventListener('click', onResizeControlsClick);
+uploadFileInput.addEventListener('change', onUplodFileInputChange);
+uploadSubmitButton.addEventListener('click', onSubbmitButtonClick);
 uploadSubmitButton.addEventListener('keydown', onUploadSubbmitButtonEnterPress);
 uploadCancelButton.addEventListener('click', onUploadButtonClick);
 cropOverlay.addEventListener('keydown', onCropFormEscapePress);
@@ -102,6 +149,41 @@ pictureElements.forEach(function (item, i) {
   });
   pictureElements[i].addEventListener('keydown', onPictureEnterPress);
 });
+
+
+function toggleFilter(filter) {
+  filterControls.forEach(function (item, i) {
+    var value = filterControls[i].value;
+    var className = 'filter-' + value;
+    removeClass(picturePreview, className);
+  });
+  var className = 'filter-' + filter.value;
+  addClass(picturePreview, className);
+}
+
+function removeClass(element, className) {
+  element.classList.remove(className);
+}
+
+function addClass(element, className) {
+  element.classList.add(className);
+}
+
+function checkValidity() {
+  var element = cropCommentField;
+  var validity = element.validity;
+  if (validity.valueMissing) {
+    element.style = 'border: 1px solid red';
+  } else {
+    showForm(uploadForm, 'invisible');
+    closeForm(cropOverlay, 'invisible');
+  }
+}
+
+function scalePhoto(value) {
+  var scaleDivider = 100;
+  picturePreview.style.transform = 'scale(' + value / scaleDivider + ')';
+}
 
 
 function closeForm(element, className) {
