@@ -35,7 +35,6 @@ var containerOfFilterControls = cropOverlay.querySelector('.upload-filter-contro
 var filterControls = containerOfFilterControls.querySelectorAll('input[type=radio]');
 var picturePreview = document.querySelector('.filter-image-preview');
 var resizeControls = cropOverlay.querySelector('.upload-resize-controls');
-//console.log(filterControls);
 
 var openGallery = function (evt) {
   galleryOverlay.classList.remove('invisible');
@@ -123,29 +122,9 @@ var onUplodFileInputChange = function (evt) {
 var onFilterClick = function (evt) {
   if (evt.target.hasAttribute('type')) {
     var filter = evt.target;
-    //var filterName = filter.value;
     toggleFilter(filter);
   }
 };
-
-function toggleFilter(filter) {
-  filterControls.forEach(function (item, i) {
-    var value = filterControls[i].value;
-    var className = 'filter-' + value;
-    removeClass(picturePreview, className);
-  });
-  var className = 'filter-' + filter.value;
-  addClass(picturePreview, className);
-
-}
-
-function removeClass(element, className) {
-  element.classList.remove(className);
-}
-
-function addClass(element, className) {
-  element.classList.add(className);
-}
 
 
 closeForm(cropOverlay, 'invisible');
@@ -171,6 +150,24 @@ pictureElements.forEach(function (item, i) {
   pictureElements[i].addEventListener('keydown', onPictureEnterPress);
 });
 
+
+function toggleFilter(filter) {
+  filterControls.forEach(function (item, i) {
+    var value = filterControls[i].value;
+    var className = 'filter-' + value;
+    removeClass(picturePreview, className);
+  });
+  var className = 'filter-' + filter.value;
+  addClass(picturePreview, className);
+}
+
+function removeClass(element, className) {
+  element.classList.remove(className);
+}
+
+function addClass(element, className) {
+  element.classList.add(className);
+}
 
 function checkValidity() {
   var element = cropCommentField;
