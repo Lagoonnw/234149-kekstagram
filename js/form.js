@@ -11,9 +11,42 @@
   var resizeControls = cropOverlay.querySelector('.upload-resize-controls');
   var picturePreview = document.querySelector('.filter-image-preview');
   var uploadFileInput = uploadForm.querySelector('.upload-input');
+  var filterLevelWrapper = cropOverlay.querySelector('.upload-filter-level');
+  var filterLeveScale = filterLevelWrapper.querySelector('.upload-filter-level-line');
+  var filterLevelValue = filterLevelWrapper.querySelector('.upload-filter-level-val');
+  var filterLevelPin = filterLevelWrapper.querySelector('.upload-filter-level-pin');
+
+  var onFilterScalePin = function (evt) {
+    evt.preventDefault();
+    var coordinateX = evt.clientX;
+    var coordinateStart = filterLeveScale.getBoundingClientRect().left;
+    var coordinateEnd = filterLeveScale.getBoundingClientRect().right;
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+      var shiftCoordinateX = coordinateX - moveEvt.clientX;
+      coordinateX = moveEvt.clientX;
+      if (coordinateX >= coordinateStart && coordinateX <= coordinateEnd) {
+        filterLevelPin.style.left = (filterLevelPin.offsetLeft - shiftCoordinateX) + 'px';
+        filterLevelValue.style.width = (filterLevelPin.offsetLeft - shiftCoordinateX) + 'px';
+        changeFilterLavel(coordinateX);
+      } else {
+        document.removeEventListener('mousemove', onMouseMove);
+      }
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+      document.removeEventListener('mousemove', onMouseMove);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
 
   var onUploadFileInputChange = function (evt) {
     hideCropForm();
+    filterLevelWrapper.style.display = 'none';
     document.addEventListener('keydown', onCropFormEscapePress);
   };
 
@@ -40,7 +73,6 @@
       document.removeEventListener('keydown', onCropFormEscapePress);
     }
   };
-
 
   var onResizeControlsClick = function (evt) {
     var stepForward = resizeControls.querySelector('.upload-resize-controls-button-inc');
@@ -72,11 +104,59 @@
   cropSubmitButton.addEventListener('keydown', onUploadSubmitButtonEnterPress);
   cropCancelButton.addEventListener('click', onCropButtonClick);
   uploadFileInput.addEventListener('change', onUploadFileInputChange);
+  filterLevelPin.addEventListener('mousedown', onFilterScalePin);
+
+  function changeFilterLavel(coordinate) {
+    var currentFilter = cropOverlay.querySelector('input[type=radio]:checked');
+    var filterName = currentFilter.value;
+    var _coordinate = coordinate - filterLeveScale.getBoundingClientRect().left;
+    var coeficient = null;
+    var styleFilter = '';
+    var unit = '';
+    switch (filterName) {
+      case 'chrome':
+        coeficient = 1;
+        styleFilter = 'grayscale';
+        break;
+      case 'sepia':
+        coeficient = 1;
+        styleFilter = 'sepia';
+        break;
+      case 'marvin':
+        coeficient = 100;
+        styleFilter = 'invert';
+        unit = '%';
+        break;
+      case 'phobos':
+        coeficient = 3;
+        styleFilter = 'blur';
+        unit = 'px';
+        break;
+      case 'heat':
+        coeficient = 3;
+        styleFilter = 'brightness';
+        break;
+      default:
+        coeficient = null;
+        styleFilter = 'none';
+    }
+    var level = _coordinate / (filterLeveScale.getBoundingClientRect().width / coeficient);
+    picturePreview.style.filter = styleFilter + '(' + level + unit + ')';
+  }
 
   function toggleFilter(filter) {
     var className = 'filter-' + filter.value;
     clearFilters();
     addFilterClass(className);
+    if (className !== 'filter-none') {
+      filterLevelWrapper.style.display = 'block';
+      changeFilterLavel(filterLeveScale.getBoundingClientRect().right);
+    } else {
+      filterLevelWrapper.style.display = 'none';
+      picturePreview.style.filter = '';
+    }
+    filterLevelPin.style.left = filterLeveScale.getBoundingClientRect().width + 'px';
+    filterLevelValue.style.width = filterLeveScale.getBoundingClientRect().width + 'px';
   }
 
   function removeFilterClass(className) {
@@ -117,6 +197,7 @@
       clearFilters();
       scalePhoto(defaultScaleValue);
       stepValue.value = '100%';
+      filterLevelWrapper.style.display = 'none';
     }
   }
 
