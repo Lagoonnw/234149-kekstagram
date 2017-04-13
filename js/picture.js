@@ -1,6 +1,6 @@
 'use strict';
 
-window.galleryMidget = (function () {
+window.picture = (function () {
   var photoTemplate = document.getElementById('picture-template').content;
 
   function createPhotoNode(photo) {

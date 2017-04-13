@@ -13,13 +13,13 @@ window.galleryPreview = (function () {
   };
 
   var onGalleryCrossEnterKeypress = function (evt) {
-    if (utils.isEnter(evt.keyCode)) {
+    if (window.utils.isEnter(evt.keyCode)) {
       closeGallery();
     }
   };
 
   var onGalleryEscapePress = function (evt) {
-    if (utils.isEsc(evt.keyCode)) {
+    if (window.utils.isEsc(evt.keyCode)) {
       closeGallery();
     }
   };

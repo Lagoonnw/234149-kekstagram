@@ -17,10 +17,8 @@ window.data = (function () {
 
   function setPhotoArray(minArrayLength, maxArrayLength) {
     var photoObject = {};
-    var photoName = null;
     for (var i = minArrayLength; i < maxArrayLength; i++) {
-      photoName = i;
-      photoObject = createPhotoObject(photoName);
+      photoObject = createPhotoObject(i);
       photoArray.push(photoObject);
     }
     return photoArray;
@@ -28,7 +26,7 @@ window.data = (function () {
 
   function createPhotoObject(photoName) {
     var photoObject = {};
-    var likesNumber = utils.getRandomNumber(minLikesNumber, maxLikesNumber);
+    var likesNumber = window.utils.getRandomNumber(minLikesNumber, maxLikesNumber);
     var comments = setArrayOfRandomComments();
     var url = generatePhotoUrl(photoName);
 
@@ -46,9 +44,10 @@ window.data = (function () {
 
   function setArrayOfRandomComments() {
     var comments = [];
-    var arrayLength = utils.getRandomNumber(minCommentsNumber, maxCommentsNumber);
-    for (var i = minCommentsNumber; i <= arrayLength; i++) {
-      var photoComment = utils.getRandomArrayItem(usersComments);
+    var commentsLength = window.utils.getRandomNumber(minCommentsNumber, maxCommentsNumber);
+    var photoComment = [];
+    for (var i = minCommentsNumber; i <= commentsLength; i++) {
+      photoComment = window.utils.getRandomArrayItem(usersComments);
       comments.push(photoComment);
     }
     return comments;
@@ -57,5 +56,3 @@ window.data = (function () {
   photoArray = setPhotoArray(1, 25);
   return photoArray;
 })();
-console.log(window.data);
-console.log(typeof(window.data));

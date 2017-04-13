@@ -28,4 +28,3 @@ window.utils = (function () {
     isEnter: isEnterKey
   };
 })();
-console.log(window.utils);

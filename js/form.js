@@ -1,6 +1,6 @@
 'use strict';
 
-window.showForm = (function () {
+(function () {
   var cropOverlay = document.querySelector('.upload-overlay');
   var uploadForm = document.getElementById('upload-select-image');
   var cropCancelButton = cropOverlay.querySelector('.upload-form-cancel');
@@ -10,33 +10,37 @@ window.showForm = (function () {
   var filterControls = containerOfFilterControls.querySelectorAll('input[type=radio]');
   var resizeControls = cropOverlay.querySelector('.upload-resize-controls');
   var picturePreview = document.querySelector('.filter-image-preview');
-  var defaultFiler = filterControls[0];
+  var uploadFileInput = uploadForm.querySelector('.upload-input');
+
+  var onUploadFileInputChange = function (evt) {
+    hideCropForm();
+    document.addEventListener('keydown', onCropFormEscapePress);
+  };
 
   var onCropButtonClick = function (evt) {
     evt.preventDefault();
-    uploadForm.classList.remove('invisible');
-    cropOverlay.classList.add('invisible');
+    showCropForm();
   };
 
   var onUploadSubmitButtonEnterPress = function (evt) {
-    if (utils.isEnter(evt.keyCode)) {
+    if (window.utils.isEnter(evt.keyCode)) {
       evt.preventDefault();
-      checkValidity();
+      checkValidity(cropCommentField);
     }
   };
 
   var onSubmitButtonClick = function (evt) {
     evt.preventDefault();
-    checkValidity();
+    resetForm(cropCommentField);
   };
 
   var onCropFormEscapePress = function (evt) {
-    if (utils.isEsc(evt.keyCode) && evt.target !== cropCommentField) {
-      uploadForm.classList.remove('invisible');
-      cropOverlay.classList.add('invisible');
+    if (window.utils.isEsc(evt.keyCode) && evt.target !== cropCommentField) {
+      showCropForm();
       document.removeEventListener('keydown', onCropFormEscapePress);
     }
   };
+
 
   var onResizeControlsClick = function (evt) {
     var stepForward = resizeControls.querySelector('.upload-resize-controls-button-inc');
@@ -48,8 +52,7 @@ window.showForm = (function () {
     var step = parseInt(stepValue.step, 10);
     if (evt.target === stepForward && value < maxValue) {
       value = value + step;
-    }
-    if (evt.target === stepBack && value > minValue) {
+    } else if (evt.target === stepBack && value > minValue) {
       value = value - step;
     }
     scalePhoto(value);
@@ -68,7 +71,7 @@ window.showForm = (function () {
   cropSubmitButton.addEventListener('click', onSubmitButtonClick);
   cropSubmitButton.addEventListener('keydown', onUploadSubmitButtonEnterPress);
   cropCancelButton.addEventListener('click', onCropButtonClick);
-  cropOverlay.addEventListener('keydown', onCropFormEscapePress);
+  uploadFileInput.addEventListener('change', onUploadFileInputChange);
 
   function toggleFilter(filter) {
     var className = 'filter-' + filter.value;
@@ -92,18 +95,28 @@ window.showForm = (function () {
     });
   }
 
-  function checkValidity() {
-    var element = cropCommentField;
+  function checkValidity(element) {
     var validity = element.validity;
-    if (validity.valueMissing) {
+    if (validity.valueMissing || validity.tooShort) {
       element.style = 'border: 1px solid red';
+      return false;
     } else {
-      uploadForm.classList.remove('invisible');
-      cropOverlay.classList.add('invisible');
+      return true;
+    }
+  }
+
+  function resetForm(element) {
+    var defaultFiler = filterControls[0];
+    var stepValue = resizeControls.querySelector('.upload-resize-controls-value');
+    var defaultScaleValue = 100;
+    if (checkValidity(element)) {
+      hideCropForm();
       element.style = 'border: none';
       element.value = '';
-      clearFilters();
       defaultFiler.checked = true;
+      clearFilters();
+      scalePhoto(defaultScaleValue);
+      stepValue.value = '100%';
     }
   }
 
@@ -112,11 +125,14 @@ window.showForm = (function () {
     picturePreview.style.transform = 'scale(' + value / scaleDivider + ')';
   }
 
-  function showForm() {
+  function hideCropForm() {
     uploadForm.classList.add('invisible');
     cropOverlay.classList.remove('invisible');
-    document.addEventListener('keydown', onCropFormEscapePress);
   }
 
-  return showForm;
+  function showCropForm() {
+    uploadForm.classList.remove('invisible');
+    cropOverlay.classList.add('invisible');
+  }
+
 })();

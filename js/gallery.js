@@ -5,7 +5,6 @@
   var picturesBlock = document.querySelector('div.pictures');
   var fragment = document.createDocumentFragment();
   var uploadForm = document.getElementById('upload-select-image');
-  var uploadFileInput = uploadForm.querySelector('.upload-input');
   var cropOverlay = document.querySelector('.upload-overlay');
 
   var openGallery = function () {
@@ -19,24 +18,20 @@
   };
 
   var onPictureEnterPress = function (evt) {
-    if (utils.isEnter(evt.keyCode)) {
+    if (window.utils.isEnter(evt.keyCode)) {
       openGallery();
     }
   };
 
   var onGalleryEscapePress = function (evt) {
-    if (utils.isEsc(evt.keyCode)) {
+    if (window.utils.isEsc(evt.keyCode)) {
       closeGallery();
     }
   };
 
-  var onUploadFileInputChange = function (evt) {
-    showForm();
-  };
-
   function showPhotos(photos) {
     photos.forEach(function (arrayItem, i) {
-      var photoNode = window.galleryMidget(photos[i]);
+      var photoNode = window.picture(photos[i]);
       var photo = photoNode.querySelector('a');
       photo.addEventListener('click', function onPictureClick(evt) {
         evt.preventDefault();
@@ -50,7 +45,6 @@
   }
 
   uploadForm.classList.remove('invisible');
-  uploadFileInput.addEventListener('change', onUploadFileInputChange);
   cropOverlay.classList.add('invisible');
-  showPhotos(data);
+  showPhotos(window.data);
 })();
