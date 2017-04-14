@@ -29,6 +29,10 @@
     }
   };
 
+  uploadForm.classList.remove('invisible');
+  cropOverlay.classList.add('invisible');
+  showPhotos(window.data);
+
   function showPhotos(photos) {
     photos.forEach(function (arrayItem, i) {
       var photoNode = window.picture(photos[i]);
@@ -44,7 +48,4 @@
     picturesBlock.appendChild(fragment);
   }
 
-  uploadForm.classList.remove('invisible');
-  cropOverlay.classList.add('invisible');
-  showPhotos(window.data);
 })();
