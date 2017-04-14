@@ -15,23 +15,22 @@
   var filterLeveScale = filterLevelWrapper.querySelector('.upload-filter-level-line');
   var filterLevelValue = filterLevelWrapper.querySelector('.upload-filter-level-val');
   var filterLevelPin = filterLevelWrapper.querySelector('.upload-filter-level-pin');
+  var filterScaleCoordinates = filterLeveScale.getBoundingClientRect();
 
-  var onFilterScalePin = function (evt) {
+  var onFilterScalePinMousedown = function (evt) {
     evt.preventDefault();
     var coordinateX = evt.clientX;
-    var coordinateStart = filterLeveScale.getBoundingClientRect().left;
-    var coordinateEnd = filterLeveScale.getBoundingClientRect().right;
-
+    var coordinateStart = filterScaleCoordinates.left;
+    var coordinateEnd = filterScaleCoordinates.right;
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
       var shiftCoordinateX = coordinateX - moveEvt.clientX;
+      var newValueForElementStyle = filterLevelPin.offsetLeft - shiftCoordinateX;
       coordinateX = moveEvt.clientX;
       if (coordinateX >= coordinateStart && coordinateX <= coordinateEnd) {
-        filterLevelPin.style.left = (filterLevelPin.offsetLeft - shiftCoordinateX) + 'px';
-        filterLevelValue.style.width = (filterLevelPin.offsetLeft - shiftCoordinateX) + 'px';
-        changeFilterLavel(coordinateX);
-      } else {
-        document.removeEventListener('mousemove', onMouseMove);
+        filterLevelPin.style.left = newValueForElementStyle + 'px';
+        filterLevelValue.style.width = newValueForElementStyle + 'px';
+        changeFilterLevel(coordinateX);
       }
     };
 
@@ -45,14 +44,14 @@
   };
 
   var onUploadFileInputChange = function (evt) {
-    hideCropForm();
+    showCropForm();
     filterLevelWrapper.style.display = 'none';
     document.addEventListener('keydown', onCropFormEscapePress);
   };
 
   var onCropButtonClick = function (evt) {
     evt.preventDefault();
-    showCropForm();
+    hideCropForm();
   };
 
   var onUploadSubmitButtonEnterPress = function (evt) {
@@ -69,7 +68,7 @@
 
   var onCropFormEscapePress = function (evt) {
     if (window.utils.isEsc(evt.keyCode) && evt.target !== cropCommentField) {
-      showCropForm();
+      hideCropForm();
       document.removeEventListener('keydown', onCropFormEscapePress);
     }
   };
@@ -104,13 +103,13 @@
   cropSubmitButton.addEventListener('keydown', onUploadSubmitButtonEnterPress);
   cropCancelButton.addEventListener('click', onCropButtonClick);
   uploadFileInput.addEventListener('change', onUploadFileInputChange);
-  filterLevelPin.addEventListener('mousedown', onFilterScalePin);
+  filterLevelPin.addEventListener('mousedown', onFilterScalePinMousedown);
 
-  function changeFilterLavel(coordinate) {
+  function changeFilterLevel(coordinate) {
     var currentFilter = cropOverlay.querySelector('input[type=radio]:checked');
     var filterName = currentFilter.value;
-    var _coordinate = coordinate - filterLeveScale.getBoundingClientRect().left;
-    var coeficient = null;
+    var _coordinate = coordinate - filterScaleCoordinates.left;
+    var coeficient = '';
     var styleFilter = '';
     var unit = '';
     switch (filterName) {
@@ -137,10 +136,10 @@
         styleFilter = 'brightness';
         break;
       default:
-        coeficient = null;
+        coeficient = '';
         styleFilter = 'none';
     }
-    var level = _coordinate / (filterLeveScale.getBoundingClientRect().width / coeficient);
+    var level = _coordinate / (filterScaleCoordinates.width / coeficient);
     picturePreview.style.filter = styleFilter + '(' + level + unit + ')';
   }
 
@@ -150,13 +149,13 @@
     addFilterClass(className);
     if (className !== 'filter-none') {
       filterLevelWrapper.style.display = 'block';
-      changeFilterLavel(filterLeveScale.getBoundingClientRect().right);
+      changeFilterLevel(filterScaleCoordinates.right);
     } else {
       filterLevelWrapper.style.display = 'none';
       picturePreview.style.filter = '';
     }
-    filterLevelPin.style.left = filterLeveScale.getBoundingClientRect().width + 'px';
-    filterLevelValue.style.width = filterLeveScale.getBoundingClientRect().width + 'px';
+    filterLevelPin.style.left = filterScaleCoordinates.width + 'px';
+    filterLevelValue.style.width = filterScaleCoordinates.width + 'px';
   }
 
   function removeFilterClass(className) {
@@ -190,14 +189,15 @@
     var stepValue = resizeControls.querySelector('.upload-resize-controls-value');
     var defaultScaleValue = 100;
     if (checkValidity(element)) {
-      hideCropForm();
       element.style = 'border: none';
+      picturePreview.style.filter = '';
       element.value = '';
       defaultFiler.checked = true;
-      clearFilters();
-      scalePhoto(defaultScaleValue);
       stepValue.value = '100%';
       filterLevelWrapper.style.display = 'none';
+      clearFilters();
+      scalePhoto(defaultScaleValue);
+      hideCropForm();
     }
   }
 
@@ -206,12 +206,12 @@
     picturePreview.style.transform = 'scale(' + value / scaleDivider + ')';
   }
 
-  function hideCropForm() {
+  function showCropForm() {
     uploadForm.classList.add('invisible');
     cropOverlay.classList.remove('invisible');
   }
 
-  function showCropForm() {
+  function hideCropForm() {
     uploadForm.classList.remove('invisible');
     cropOverlay.classList.add('invisible');
   }
