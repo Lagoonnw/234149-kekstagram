@@ -16,6 +16,13 @@
   var filterLevelValue = filterLevelWrapper.querySelector('.upload-filter-level-val');
   var filterLevelPin = filterLevelWrapper.querySelector('.upload-filter-level-pin');
   var filterScaleCoordinates = filterLeveScale.getBoundingClientRect();
+  var stepForward = resizeControls.querySelector('.upload-resize-controls-button-inc');
+  var stepBack = resizeControls.querySelector('.upload-resize-controls-button-dec');
+  var stepValue = resizeControls.querySelector('.upload-resize-controls-value');
+  var minValue = stepValue.getAttribute('min');
+  var maxValue = stepValue.getAttribute('max');
+  var scaleValue = parseInt(stepValue.value, 10);
+  var step = parseInt(stepValue.step, 10);
 
   var onFilterScalePinMousedown = function (evt) {
     evt.preventDefault();
@@ -31,6 +38,10 @@
         filterLevelPin.style.left = newValueForElementStyle + 'px';
         filterLevelValue.style.width = newValueForElementStyle + 'px';
         changeFilterLevel(coordinateX);
+      } else if (coordinateX < coordinateStart) {
+        coordinateX = coordinateStart;
+      } else if (coordinateX > coordinateEnd) {
+        coordinateX = coordinateEnd;
       }
     };
 
@@ -73,32 +84,8 @@
     }
   };
 
-  var onResizeControlsClick = function (evt) {
-    var stepForward = resizeControls.querySelector('.upload-resize-controls-button-inc');
-    var stepBack = resizeControls.querySelector('.upload-resize-controls-button-dec');
-    var stepValue = resizeControls.querySelector('.upload-resize-controls-value');
-    var minValue = stepValue.getAttribute('min');
-    var maxValue = stepValue.getAttribute('max');
-    var value = parseInt(stepValue.value, 10);
-    var step = parseInt(stepValue.step, 10);
-    if (evt.target === stepForward && value < maxValue) {
-      value = value + step;
-    } else if (evt.target === stepBack && value > minValue) {
-      value = value - step;
-    }
-    scalePhoto(value);
-    stepValue.value = value + '%';
-  };
-
-  var onFilterClick = function (evt) {
-    if (evt.target.hasAttribute('type')) {
-      var filter = evt.target;
-      toggleFilter(filter);
-    }
-  };
-
-  containerOfFilterControls.addEventListener('click', onFilterClick);
-  resizeControls.addEventListener('click', onResizeControlsClick);
+  window.initializeScale(scaleValue, stepForward, stepBack, step, minValue, maxValue, scalePhoto);
+  window.initializeFilters(filterControls, applayFilter);
   cropSubmitButton.addEventListener('click', onSubmitButtonClick);
   cropSubmitButton.addEventListener('keydown', onUploadSubmitButtonEnterPress);
   cropCancelButton.addEventListener('click', onCropButtonClick);
@@ -143,11 +130,12 @@
     picturePreview.style.filter = styleFilter + '(' + level + unit + ')';
   }
 
-  function toggleFilter(filter) {
-    var className = 'filter-' + filter.value;
-    clearFilters();
-    addFilterClass(className);
-    if (className !== 'filter-none') {
+  function applayFilter(oldFilters, newFilter) {
+    oldFilters.forEach(function (item, i) {
+      picturePreview.classList.remove(oldFilters[i]);
+    });
+    picturePreview.classList.add(newFilter);
+    if (newFilter !== 'filter-none') {
       filterLevelWrapper.style.display = 'block';
       changeFilterLevel(filterScaleCoordinates.right);
     } else {
@@ -158,19 +146,11 @@
     filterLevelValue.style.width = filterScaleCoordinates.width + 'px';
   }
 
-  function removeFilterClass(className) {
-    picturePreview.classList.remove(className);
-  }
-
-  function addFilterClass(className) {
-    picturePreview.classList.add(className);
-  }
-
   function clearFilters() {
     filterControls.forEach(function (item, i) {
       var value = filterControls[i].value;
       var className = 'filter-' + value;
-      removeFilterClass(className);
+      picturePreview.classList.remove(className);
     });
   }
 
@@ -186,7 +166,6 @@
 
   function resetForm(element) {
     var defaultFiler = filterControls[0];
-    var stepValue = resizeControls.querySelector('.upload-resize-controls-value');
     var defaultScaleValue = 100;
     if (checkValidity(element)) {
       element.style = 'border: none';
@@ -201,9 +180,10 @@
     }
   }
 
-  function scalePhoto(value) {
+  function scalePhoto(scale) {
     var scaleDivider = 100;
-    picturePreview.style.transform = 'scale(' + value / scaleDivider + ')';
+    picturePreview.style.transform = 'scale(' + scale / scaleDivider + ')';
+    stepValue.value = scale + '%';
   }
 
   function showCropForm() {
