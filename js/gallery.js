@@ -29,6 +29,13 @@
     }
   };
 
+  // load-js
+  var onLoad = function (data) {
+    console.log(data);
+  };
+
+  // load-js
+  window.load('https://intensive-javascript-server-kjgvxfepjl.now.sh/kekstagram/data', onLoad);
   uploadForm.classList.remove('invisible');
   cropOverlay.classList.add('invisible');
   showPhotos(window.data);

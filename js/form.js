@@ -133,7 +133,7 @@
 
   function applyFilter(currentFilter, newFilter) {
     var styleValue = filterScaleCoordinates.width + 'px';
-    if (currentFilter !== null) {
+    if (currentFilter !== '') {
       picturePreview.classList.remove(currentFilter);
     }
     picturePreview.classList.add(newFilter);
@@ -201,5 +201,4 @@
     uploadForm.classList.remove('invisible');
     cropOverlay.classList.add('invisible');
   }
-
 })();

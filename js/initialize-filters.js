@@ -10,7 +10,7 @@ window.initializeFilters = (function (controls, element, callback) {
       if (filters.length > filtersItemIndex) {
         currentFilter = filters.pop(filtersItemIndex);
       } else {
-        currentFilter = null;
+        currentFilter = '';
       }
       var filter = controls[i];
       var newFilter = 'filter-' + filter.value;
