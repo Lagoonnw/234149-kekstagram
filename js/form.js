@@ -12,17 +12,17 @@
   var picturePreview = document.querySelector('.filter-image-preview');
   var uploadFileInput = uploadForm.querySelector('.upload-input');
   var filterLevelWrapper = cropOverlay.querySelector('.upload-filter-level');
-  var filterLeveScale = filterLevelWrapper.querySelector('.upload-filter-level-line');
+  var filterLevelScale = filterLevelWrapper.querySelector('.upload-filter-level-line');
   var filterLevelValue = filterLevelWrapper.querySelector('.upload-filter-level-val');
   var filterLevelPin = filterLevelWrapper.querySelector('.upload-filter-level-pin');
-  var filterScaleCoordinates = filterLeveScale.getBoundingClientRect();
-  var stepForward = resizeControls.querySelector('.upload-resize-controls-button-inc');
-  var stepBack = resizeControls.querySelector('.upload-resize-controls-button-dec');
+  var filterScaleCoordinates = filterLevelScale.getBoundingClientRect();
+  var stepIncrement = resizeControls.querySelector('.upload-resize-controls-button-inc');
+  var stepDecrement = resizeControls.querySelector('.upload-resize-controls-button-dec');
   var stepValue = resizeControls.querySelector('.upload-resize-controls-value');
-  var minValue = stepValue.getAttribute('min');
-  var maxValue = stepValue.getAttribute('max');
+  var minScaleValue = stepValue.getAttribute('min');
+  var maxScaleValue = stepValue.getAttribute('max');
   var scaleValue = parseInt(stepValue.value, 10);
-  var step = parseInt(stepValue.step, 10);
+  var scaleStep = parseInt(stepValue.step, 10);
 
   var onFilterScalePinMousedown = function (evt) {
     evt.preventDefault();
@@ -62,7 +62,7 @@
 
   var onCropButtonClick = function (evt) {
     evt.preventDefault();
-    hideCropForm();
+    resetFormValues(cropCommentField);
   };
 
   var onUploadSubmitButtonEnterPress = function (evt) {
@@ -79,16 +79,17 @@
 
   var onCropFormEscapePress = function (evt) {
     if (window.utils.isEsc(evt.keyCode) && evt.target !== cropCommentField) {
-      hideCropForm();
+      resetFormValues(cropCommentField);
       document.removeEventListener('keydown', onCropFormEscapePress);
     }
   };
 
-  window.initializeScale(scaleValue, stepForward, stepBack, step, minValue, maxValue, scalePhoto);
-  window.initializeFilters(filterControls, applayFilter);
+  window.initializeScale(scaleValue, stepIncrement, stepDecrement, scaleStep, minScaleValue, maxScaleValue, scalePhotoHandler);
+  window.initializeFilters(filterControls, picturePreview, applyFilter);
   cropSubmitButton.addEventListener('click', onSubmitButtonClick);
   cropSubmitButton.addEventListener('keydown', onUploadSubmitButtonEnterPress);
   cropCancelButton.addEventListener('click', onCropButtonClick);
+  cropCancelButton.addEventListener('keydown', onCropFormEscapePress);
   uploadFileInput.addEventListener('change', onUploadFileInputChange);
   filterLevelPin.addEventListener('mousedown', onFilterScalePinMousedown);
 
@@ -130,10 +131,11 @@
     picturePreview.style.filter = styleFilter + '(' + level + unit + ')';
   }
 
-  function applayFilter(oldFilters, newFilter) {
-    oldFilters.forEach(function (item, i) {
-      picturePreview.classList.remove(oldFilters[i]);
-    });
+  function applyFilter(currentFilter, newFilter) {
+    var styleValue = filterScaleCoordinates.width + 'px';
+    if (currentFilter !== null) {
+      picturePreview.classList.remove(currentFilter);
+    }
     picturePreview.classList.add(newFilter);
     if (newFilter !== 'filter-none') {
       filterLevelWrapper.style.display = 'block';
@@ -142,8 +144,8 @@
       filterLevelWrapper.style.display = 'none';
       picturePreview.style.filter = '';
     }
-    filterLevelPin.style.left = filterScaleCoordinates.width + 'px';
-    filterLevelValue.style.width = filterScaleCoordinates.width + 'px';
+    filterLevelPin.style.left = styleValue;
+    filterLevelValue.style.width = styleValue;
   }
 
   function clearFilters() {
@@ -165,22 +167,26 @@
   }
 
   function resetForm(element) {
-    var defaultFiler = filterControls[0];
-    var defaultScaleValue = 100;
     if (checkValidity(element)) {
-      element.style = 'border: none';
-      picturePreview.style.filter = '';
-      element.value = '';
-      defaultFiler.checked = true;
-      stepValue.value = '100%';
-      filterLevelWrapper.style.display = 'none';
-      clearFilters();
-      scalePhoto(defaultScaleValue);
-      hideCropForm();
+      resetFormValues(element);
     }
   }
 
-  function scalePhoto(scale) {
+  function resetFormValues(element) {
+    var defaultFiler = filterControls[0];
+    var defaultScaleValue = 100;
+    element.style = 'border: none';
+    picturePreview.style.filter = '';
+    element.value = '';
+    defaultFiler.checked = true;
+    stepValue.value = '100%';
+    filterLevelWrapper.style.display = 'none';
+    clearFilters();
+    scalePhotoHandler(defaultScaleValue);
+    hideCropForm();
+  }
+
+  function scalePhotoHandler(scale) {
     var scaleDivider = 100;
     picturePreview.style.transform = 'scale(' + scale / scaleDivider + ')';
     stepValue.value = scale + '%';
