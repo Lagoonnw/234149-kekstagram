@@ -29,14 +29,15 @@
     var coordinateX = evt.clientX;
     var coordinateStart = filterScaleCoordinates.left;
     var coordinateEnd = filterScaleCoordinates.right;
+
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
       var shiftCoordinateX = coordinateX - moveEvt.clientX;
-      var newValueForElementStyle = filterLevelPin.offsetLeft - shiftCoordinateX;
+      var newValueForElementStyle = filterLevelPin.offsetLeft - shiftCoordinateX + 'px';
       coordinateX = moveEvt.clientX;
       if (coordinateX >= coordinateStart && coordinateX <= coordinateEnd) {
-        filterLevelPin.style.left = newValueForElementStyle + 'px';
-        filterLevelValue.style.width = newValueForElementStyle + 'px';
+        filterLevelPin.style.left = newValueForElementStyle;
+        filterLevelValue.style.width = newValueForElementStyle;
         changeFilterLevel(coordinateX);
       } else if (coordinateX < coordinateStart) {
         coordinateX = coordinateStart;
@@ -85,7 +86,7 @@
   };
 
   window.initializeScale(scaleValue, stepIncrement, stepDecrement, scaleStep, minScaleValue, maxScaleValue, scalePhotoHandler);
-  window.initializeFilters(filterControls, picturePreview, applyFilter);
+  window.initializeFilters(filterControls, applyFilter);
   cropSubmitButton.addEventListener('click', onSubmitButtonClick);
   cropSubmitButton.addEventListener('keydown', onUploadSubmitButtonEnterPress);
   cropCancelButton.addEventListener('click', onCropButtonClick);
@@ -131,9 +132,14 @@
     picturePreview.style.filter = styleFilter + '(' + level + unit + ')';
   }
 
-  function applyFilter(currentFilter, newFilter) {
+  function applyFilter(newFilter) {
+    var currentFilter;
     var styleValue = filterScaleCoordinates.width + 'px';
-    if (currentFilter !== '') {
+    var picturePreviewFilters = picturePreview.getAttribute('class').split(' ');
+    var pictureFiltersItemIndex = 1;
+
+    if (picturePreviewFilters.length > pictureFiltersItemIndex) {
+      currentFilter = picturePreviewFilters.pop(pictureFiltersItemIndex);
       picturePreview.classList.remove(currentFilter);
     }
     picturePreview.classList.add(newFilter);
