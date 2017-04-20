@@ -1,18 +1,18 @@
 'use strict';
 
-window.initializeScale = (function (scaleValue, increase, decrease, step, minValue, maxValue, callback) {
+window.initializeScale = (function (scaleValue, scaleIncrease, scaleDecrease, scaleStep, minScaleValue, maxScaleValue, callback) {
   var _scaleValue = scaleValue;
 
-  decrease.addEventListener('click', function () {
-    if (_scaleValue > minValue) {
-      _scaleValue = _scaleValue - step;
+  scaleDecrease.addEventListener('click', function () {
+    if (_scaleValue > minScaleValue) {
+      _scaleValue = _scaleValue - scaleStep;
     }
     callback(_scaleValue);
   });
 
-  increase.addEventListener('click', function () {
-    if (_scaleValue < maxValue) {
-      _scaleValue = _scaleValue + step;
+  scaleIncrease.addEventListener('click', function () {
+    if (_scaleValue < maxScaleValue) {
+      _scaleValue = _scaleValue + scaleStep;
     }
     callback(_scaleValue);
   });

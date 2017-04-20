@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/kekstagram/data';
   var galleryOverlay = document.querySelector('.gallery-overlay');
   var picturesBlock = document.querySelector('div.pictures');
   var fragment = document.createDocumentFragment();
@@ -29,9 +30,14 @@
     }
   };
 
+  var onLoad = function (data) {
+    showPhotos(data);
+  };
+
+
+  window.load(URL, onLoad);
   uploadForm.classList.remove('invisible');
   cropOverlay.classList.add('invisible');
-  showPhotos(window.data);
 
   function showPhotos(photos) {
     photos.forEach(function (arrayItem, i) {
