@@ -6,6 +6,7 @@
   var fragment = document.createDocumentFragment();
   var uploadForm = document.getElementById('upload-select-image');
   var cropOverlay = document.querySelector('.upload-overlay');
+  var URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/kekstagram/data';
 
   var openGallery = function () {
     galleryOverlay.classList.remove('invisible');
@@ -29,16 +30,47 @@
     }
   };
 
-  // load-js
   var onLoad = function (data) {
-    console.log(data);
+    showPhotos(data);
   };
 
-  // load-js
-  window.load('https://intensive-javascript-server-kjgvxfepjl.now.sh/kekstagram/data', onLoad);
+  var errorHandler = function (error) {
+    var errorDiv = document.createElement('div');
+    var errorDivStyle = errorDiv.style;
+    var errorMessage;
+    var errorStatus = 'Ошибка: ' + error;
+    switch (error) {
+      case 404:
+        errorMessage = errorStatus + '. Страница не найдена.';
+        break;
+      case 403:
+        errorMessage = errorStatus + '. Доступ запрещен.';
+        break;
+      case 401:
+        errorMessage = errorStatus + '. Вы не авторизованы.';
+        break;
+      case 503:
+        errorMessage = errorStatus + '. Сервер временно не доступен.';
+        break;
+      default:
+        errorMessage = 'Что-то пошло не так.';
+    }
+    errorDivStyle.position = 'absolute';
+    errorDivStyle.zIndex = '9999';
+    errorDivStyle.top = '0';
+    errorDivStyle.left = '0';
+    errorDivStyle.padding = '20px';
+    errorDivStyle.width = '100%';
+    errorDivStyle.backgroundColor = 'red';
+    errorDivStyle.color ='#ffffff';
+    errorDivStyle.textAlign = 'center';
+    errorDiv.innerHTML = '<p><b>' + errorMessage + '</b></p>';
+    document.body.appendChild(errorDiv);
+  };
+
+  window.load(URL, onLoad, errorHandler);
   uploadForm.classList.remove('invisible');
   cropOverlay.classList.add('invisible');
-  showPhotos(window.data);
 
   function showPhotos(photos) {
     photos.forEach(function (arrayItem, i) {

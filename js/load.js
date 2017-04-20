@@ -1,16 +1,17 @@
 'use strict';
 
- window.load = (function (url, callback) {
+ window.load = (function (url, onSuccsess, onError) {
    var xhr = new XMLHttpRequest();
    xhr.responseType = 'json';
+
    xhr.addEventListener('load', function () {
      if (xhr.status === 200) {
-       callback(xhr.response);
+       onSuccsess(xhr.response);
      } else {
-       console.log('error');
+       onError(xhr.status);
      }
    });
-   
+
    xhr.open('GET', url);
    xhr.send();
  });
