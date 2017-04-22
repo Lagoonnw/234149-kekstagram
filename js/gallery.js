@@ -41,23 +41,8 @@
   var onGalleryFiltersClick = function (evt) {
     if (evt.target.hasAttribute('type')) {
       var galleryFilter = evt.target;
-      switch (galleryFilter.value) {
-        case 'new':
-          window.utils.debounce(function () {
-            showNewPhotos(pictures);
-          });
-          break;
-        case 'popular':
-          window.utils.debounce(function () {
-            showPopularPhotos(pictures);
-          });
-          break;
-        case 'discussed':
-          window.utils.debounce(function () {
-            showtDiscussedPhotos(pictures);
-          });
-          break;
-      }
+      var galleryFilterName = galleryFilter.value;
+      window.utils.debounce((showSelectedPhotos(galleryFilterName)));
     }
   };
 
@@ -82,30 +67,28 @@
     picturesBlock.appendChild(fragment);
   }
 
+  function showSelectedPhotos(galleryFilterName) {
+    var photos = pictures.slice(0);
+    removePictures(picturesBlock);
+    switch (galleryFilterName) {
+      case 'popular':
+        showPhotos(photos);
+        break;
+      case 'new':
+        photos = photos.sort(window.utils.sortRandom).slice(0, 10);
+        showPhotos(photos);
+        break;
+      case 'discussed':
+        photos = photos.slice(0).sort(function (a, b) {
+          return b.comments.length - a.comments.length;
+        });
+        showPhotos(photos);
+    }
+  }
+
   function removePictures(container) {
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
-  }
-
-  function showPopularPhotos(photos) {
-    var _photos = photos;
-    removePictures(picturesBlock);
-    showPhotos(_photos);
-  }
-
-  function showNewPhotos(photos) {
-    var _photos = photos.sort(window.utils.sortRandom).slice(0, 10);
-    removePictures(picturesBlock);
-    showPhotos(_photos);
-  }
-
-  function showtDiscussedPhotos(photos) {
-    var sortCompare = function (a, b) {
-      return b.comments.length - a.comments.length;
-    };
-    var _photos = photos.sort(sortCompare).slice();
-    removePictures(picturesBlock);
-    showPhotos(_photos);
   }
 })();

@@ -164,7 +164,7 @@
 
   function checkValidity(element) {
     var validity = element.validity;
-    if (validity.valueMissing || validity.tooShort) {
+    if (validity.valueMissing || validity.tooShort || validity.tooLong) {
       element.style = 'border: 1px solid red';
       return false;
     } else {
