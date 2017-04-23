@@ -167,12 +167,11 @@
   }
 
   function checkValidity(element) {
-    var validity = element.validity;
-    if (validity.valueMissing || validity.tooShort || validity.tooLong) {
+    if (element.checkValidity() && element.classList.contains('upload-form-description') && element.value.length > 30) {
+      return true;
+    } else {
       element.style.border = '1px solid red';
       return false;
-    } else {
-      return true;
     }
   }
 
