@@ -9,12 +9,13 @@ window.picture = (function () {
     var img = photoNode.querySelector('img');
     var likeCount = photoNode.querySelector('.picture-likes');
 
-    comment.textContent = photo.comments;
+    comment.textContent = photo.comments.length;
     img.setAttribute('src', photo.url);
     img.setAttribute('tabindex', 0);
     likeCount.textContent = photo.likes;
 
     return photoNode;
   }
+
   return createPhotoNode;
 })();

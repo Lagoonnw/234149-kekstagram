@@ -1,11 +1,11 @@
 'use strict';
 
-window.initializeFilters = (function (controls, callback) {
-  controls.forEach(function (item, i) {
-    controls[i].addEventListener('click', function () {
-      var filter = controls[i];
+window.initializeFilters = (function (controlsContainer, callback) {
+  controlsContainer.addEventListener('click', function (evt) {
+    if (evt.target.hasAttribute('type')) {
+      var filter = evt.target;
       var newFilter = 'filter-' + filter.value;
       callback(newFilter);
-    });
+    }
   });
 });

@@ -531,6 +531,14 @@ input[type=radio]:checked + .upload-filter-label .upload-filter-preview {
   text-align: center;
 }
 
+.picture:nth-child(19) {
+  margin-right: 0;
+}
+
+.picture:nth-child(26) {
+  margin-right: 0;
+}
+
 .picture img {
   height: 182px;
   margin-bottom: -34px;

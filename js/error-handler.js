@@ -1,6 +1,10 @@
 'use strict';
 
 window.errorHandler = function (errorType, error) {
+  var PAGE_NOT_FOUND = 404;
+  var FORBIDDEN = 403;
+  var UNAUTHORIZED = 401;
+  var SERVICE_UVAVAILABLE = 503;
   var errorDiv = document.createElement('div');
   var errorDivStyle = errorDiv.style;
   var errorMessage;
@@ -8,16 +12,16 @@ window.errorHandler = function (errorType, error) {
   switch (errorType) {
     case 'statusErr':
       switch (error) {
-        case 404:
+        case PAGE_NOT_FOUND:
           errorMessage = errorStatus + '. Страница не найдена.';
           break;
-        case 403:
+        case FORBIDDEN:
           errorMessage = errorStatus + '. Доступ запрещен.';
           break;
-        case 401:
+        case UNAUTHORIZED:
           errorMessage = errorStatus + '. Вы не авторизованы.';
           break;
-        case 503:
+        case SERVICE_UVAVAILABLE:
           errorMessage = errorStatus + '. Сервер временно не доступен.';
           break;
         default:

@@ -32,5 +32,6 @@ window.galleryPreview = (function () {
     galleryLikesCount.textContent = photos[photoIndexNumber].likes;
     galleryCommentsCount.textContent = photos[photoIndexNumber].comments.length;
   }
+
   return showGalleryOverlay;
 })();
