@@ -35,7 +35,6 @@
   var onLoad = function (data) {
     pictures = data;
     showPhotos(pictures);
-    return pictures;
   };
 
   var onGalleryFiltersClick = function (evt) {
@@ -44,6 +43,12 @@
       var galleryFilterName = galleryFilter.value;
       window.utils.debounce((showSelectedPhotos(galleryFilterName)));
     }
+  };
+
+  var onPictureClick = function (evt, photos, i) {
+    evt.preventDefault();
+    openGallery();
+    window.galleryPreview(photos, i);
   };
 
   window.load(URL, onLoad);
@@ -56,10 +61,8 @@
     photos.forEach(function (arrayItem, i) {
       var photoNode = window.picture(photos[i]);
       var photo = photoNode.querySelector('a');
-      photo.addEventListener('click', function onPictureClick(evt) {
-        evt.preventDefault();
-        openGallery();
-        window.galleryPreview(photos, i);
+      photo.addEventListener('click', function (evt) {
+        onPictureClick(evt, photos, i);
       });
       photo.addEventListener('keydown', onPictureEnterPress);
       fragment.appendChild(photoNode);

@@ -4,15 +4,14 @@ window.utils = (function () {
   var ESC_KEY_CODE = 27;
   var ENTER_KEY_CODE = 13;
   var DEBOUNCE_INTERVAL = 500;
-  var lastTimeout;
 
   var getRandomArrayItem = function (array) {
     var randomNumber = Math.floor(Math.random() * array.length);
     return array[randomNumber];
   };
 
-  var getRandomNumber = function (min, max) {
-    return Math.floor(Math.random() * ((max + 1) - min) + min);
+  var getRandomNumber = function (minimumValue, maximumValue) {
+    return Math.floor(Math.random() * ((maximumValue + 1) - minimumValue) + minimumValue);
   };
 
   var isEscKey = function (keyCode) {
@@ -28,6 +27,7 @@ window.utils = (function () {
   };
 
   var debounce = function (cb) {
+    var lastTimeout;
     if (lastTimeout) {
       window.clearTimeout(lastTimeout);
     }

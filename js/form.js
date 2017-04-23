@@ -23,37 +23,40 @@
   var maxScaleValue = stepValue.getAttribute('max');
   var scaleValue = parseInt(stepValue.value, 10);
   var scaleStep = parseInt(stepValue.step, 10);
+  var filterCoordinateStart = filterScaleCoordinates.left;
+  var filterCoordinateEnd = filterScaleCoordinates.right;
+  var filterCoordinateX;
 
   var onFilterScalePinMousedown = function (evt) {
     evt.preventDefault();
-    var coordinateX = evt.clientX;
-    var coordinateStart = filterScaleCoordinates.left;
-    var coordinateEnd = filterScaleCoordinates.right;
+    filterCoordinateX = evt.clientX;
 
-    var onMouseMove = function (moveEvt) {
-      moveEvt.preventDefault();
-      var shiftCoordinateX = coordinateX - moveEvt.clientX;
-      var newValueForElementStyle = filterLevelPin.offsetLeft - shiftCoordinateX + 'px';
-      coordinateX = moveEvt.clientX;
-      if (coordinateX >= coordinateStart && coordinateX <= coordinateEnd) {
-        filterLevelPin.style.left = newValueForElementStyle;
-        filterLevelValue.style.width = newValueForElementStyle;
-        changeFilterLevel(coordinateX);
-      } else if (coordinateX < coordinateStart) {
-        coordinateX = coordinateStart;
-      } else if (coordinateX > coordinateEnd) {
-        coordinateX = coordinateEnd;
-      }
-    };
-
-    var onMouseUp = function (upEvt) {
-      upEvt.preventDefault();
-      document.removeEventListener('mousemove', onMouseMove);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onFilterScalePinMouseMove);
+    document.addEventListener('mouseup', onFilterScalePinMouseUp);
   };
+
+  var onFilterScalePinMouseMove = function (evt) {
+    evt.preventDefault();
+    var shiftCoordinateX = filterCoordinateX - evt.clientX;
+    var newValueForElementStyle = filterLevelPin.offsetLeft - shiftCoordinateX + 'px';
+    filterCoordinateX = evt.clientX;
+    if (filterCoordinateX >= filterCoordinateStart && filterCoordinateX <= filterCoordinateEnd) {
+      filterLevelPin.style.left = newValueForElementStyle;
+      filterLevelValue.style.width = newValueForElementStyle;
+      changeFilterLevel(filterCoordinateX);
+    } else if (filterCoordinateX < filterCoordinateStart) {
+      filterCoordinateX = filterCoordinateStart;
+    } else if (filterCoordinateX > filterCoordinateEnd) {
+      filterCoordinateX = filterCoordinateEnd;
+    }
+  };
+
+  var onFilterScalePinMouseUp = function (evt) {
+    evt.preventDefault();
+    document.removeEventListener('mousemove', onFilterScalePinMouseMove);
+    document.removeEventListener('mouseup', onFilterScalePinMouseUp);
+  };
+
 
   var onUploadFileInputChange = function (evt) {
     showCropForm();
@@ -86,7 +89,7 @@
   };
 
   window.initializeScale(scaleValue, stepIncrement, stepDecrement, scaleStep, minScaleValue, maxScaleValue, scalePhotoHandler);
-  window.initializeFilters(filterControls, applyFilter);
+  window.initializeFilters(containerOfFilterControls, applyFilter);
   cropSubmitButton.addEventListener('click', onSubmitButtonClick);
   cropSubmitButton.addEventListener('keydown', onUploadSubmitButtonEnterPress);
   cropCancelButton.addEventListener('click', onCropButtonClick);
@@ -155,6 +158,7 @@
   }
 
   function clearFilters() {
+    filterControls = Array.prototype.slice.call(filterControls);
     filterControls.forEach(function (item, i) {
       var value = filterControls[i].value;
       var className = 'filter-' + value;
@@ -165,7 +169,7 @@
   function checkValidity(element) {
     var validity = element.validity;
     if (validity.valueMissing || validity.tooShort || validity.tooLong) {
-      element.style = 'border: 1px solid red';
+      element.style.border = '1px solid red';
       return false;
     } else {
       return true;
@@ -181,7 +185,7 @@
   function resetFormValues(element) {
     var defaultFiler = filterControls[0];
     var defaultScaleValue = 100;
-    element.style = 'border: none';
+    element.style.border = 'none';
     picturePreview.style.filter = '';
     element.value = '';
     defaultFiler.checked = true;
@@ -192,10 +196,10 @@
     hideCropForm();
   }
 
-  function scalePhotoHandler(scale) {
+  function scalePhotoHandler(defaultScaleValue) {
     var scaleDivider = 100;
-    picturePreview.style.transform = 'scale(' + scale / scaleDivider + ')';
-    stepValue.value = scale + '%';
+    picturePreview.style.transform = 'scale(' + defaultScaleValue / scaleDivider + ')';
+    stepValue.value = defaultScaleValue + '%';
   }
 
   function showCropForm() {
