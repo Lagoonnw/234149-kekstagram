@@ -60,7 +60,7 @@
 
   var onUploadFileInputChange = function (evt) {
     showCropForm();
-    filterLevelWrapper.style.display = 'none';
+    filterLevelWrapper.classList.add('hidden');
     document.addEventListener('keydown', onCropFormEscapePress);
   };
 
@@ -142,15 +142,15 @@
     var pictureFiltersItemIndex = 1;
 
     if (picturePreviewFilters.length > pictureFiltersItemIndex) {
-      currentFilter = picturePreviewFilters.pop(pictureFiltersItemIndex);
+      currentFilter = picturePreviewFilters.pop();
       picturePreview.classList.remove(currentFilter);
     }
     picturePreview.classList.add(newFilter);
     if (newFilter !== 'filter-none') {
-      filterLevelWrapper.style.display = 'block';
+      filterLevelWrapper.classList.remove('hidden');
       changeFilterLevel(filterScaleCoordinates.right);
     } else {
-      filterLevelWrapper.style.display = 'none';
+      filterLevelWrapper.classList.add('hidden');
       picturePreview.style.filter = '';
     }
     filterLevelPin.style.left = styleValue;
@@ -167,10 +167,11 @@
   }
 
   function checkValidity(element) {
-    if (element.checkValidity() && element.classList.contains('upload-form-description') && element.value.length > 30) {
+    var minValueLength = 30;
+    if (element.checkValidity() && element.classList.contains('upload-form-description') && element.value.length > minValueLength) {
       return true;
     } else {
-      element.style.border = '1px solid red';
+      element.classList.add('invalid-textarea');
       return false;
     }
   }
@@ -184,12 +185,12 @@
   function resetFormValues(element) {
     var defaultFiler = filterControls[0];
     var defaultScaleValue = 100;
-    element.style.border = 'none';
+    element.classList.remove('invalid-textarea');
     picturePreview.style.filter = '';
     element.value = '';
     defaultFiler.checked = true;
     stepValue.value = '100%';
-    filterLevelWrapper.style.display = 'none';
+    filterLevelWrapper.classList.add('hidden');
     clearFilters();
     scalePhotoHandler(defaultScaleValue);
     hideCropForm();

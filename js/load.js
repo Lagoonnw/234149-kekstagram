@@ -1,27 +1,17 @@
 'use strict';
 
-window.load = (function (url, onLoad) {
-  var xhr = new XMLHttpRequest();
-  var OK_STATUS = 200;
-  xhr.responseType = 'json';
-  xhr.timeout = 10000;
+ window.load = (function (url, onSuccsess, onError) {
+   var xhr = new XMLHttpRequest();
+   xhr.responseType = 'json';
 
-  xhr.addEventListener('load', function () {
-    if (xhr.status === OK_STATUS) {
-      onLoad(xhr.response);
-    } else {
-      window.errorHandler('statusErr', xhr.status);
-    }
-  });
+   xhr.addEventListener('load', function () {
+     if (xhr.status === 200) {
+       onSuccsess(xhr.response);
+     } else {
+       onError(xhr.status);
+     }
+   });
 
-  xhr.addEventListener('timeout', function () {
-    window.errorHandler('timeoutErr', xhr.timeout);
-  });
-
-  xhr.addEventListener('error', function () {
-    window.errorHandler('connectionErr', 'Произошла ошибка соединения');
-  });
-
-  xhr.open('GET', url);
-  xhr.send();
-});
+   xhr.open('GET', url);
+   xhr.send();
+ });
