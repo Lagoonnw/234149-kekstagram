@@ -158,7 +158,6 @@
   }
 
   function clearFilters() {
-    filterControls = Array.prototype.slice.call(filterControls);
     filterControls.forEach(function (item, i) {
       var value = filterControls[i].value;
       var className = 'filter-' + value;
